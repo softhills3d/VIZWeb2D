@@ -13,7 +13,7 @@
 ---
 ## 구성
 +  VIZCore2D : VIZWeb2D 배포 폴더 ( 배포 받아서 사용 )
-    - MODEL : 예제에 활용되는 모델(*.vizx2d) 파일
+    - model : 예제에 활용되는 모델(*.vizx2d) 파일
     - service : 출력 및 캡쳐 서비스 ( 별도 Agent 적용 되어야 적용 ) 
 +  index.html : VIZWeb2D의 기본 페이지
 +  WatermarkEditor.html : VIZWeb2D의 워터마크 편집기 페이지
