@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Watermark Editor</title>
+    <link rel="stylesheet" href="./VIZCore2D/resource/css/VIZCore.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            height: 100vh;
+        }
+
+        h1 {
+            display: block;
+            font-size: 2em;
+            margin-block-start: 0;
+            margin-block-end: 0.6em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+            unicode-bidi: isolate;
+        }
+
+        h2 {
+            display: block;
+            font-size: 1.5em;
+            margin-block-start: 0;
+            margin-block-end: 0;
+            padding-bottom: 10px;
+            font-weight: bold;
+            unicode-bidi: isolate;
+            font-size: 18px;
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            height: 80%;
+            gap: 10px;
+        }
+
+        .canvas-container {
+            flex: 3;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+        }
+
+        .control-panel,
+        .result-panel {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+        textarea {
+            width: 100%;
+            flex-grow: 1;
+            resize: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        /* 스크롤바 스타일 설정 */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 6px;
+        }
+
+        .list-group::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .list-group::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        .list-group::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #copyButton {
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            margin: 5px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .onoff-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        label {
+            display: block;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="file"] {
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="color"] {
+            height: 20px;
+            width: 60px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .result-area {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .text-input {
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        .image-group {
+            display: none;
+            flex-direction: column;
+        }
+
+        .text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .font-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .paragraph-group {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .image-text-group {
+            margin-top: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #imageTextInput {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .image-font-group {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        fieldset {
+            border: 2px solid #aaa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        legend {
+            color: #aaa;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .file-group {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .image-URL-group {
+            padding: 5px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #imageURLMessage {
+            display: flex;
+            margin-bottom: 0px;
+        }
+
+        .list-group {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #resultArea {
+            flex: 5;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Watermark Editor</h1>
+    <div class="container">
+        <div class="canvas-container">
+            <div id="view2D"></div>
+        </div>
+        <div class="control-panel">
+            <h2>Style</h2>
+            <fieldset>
+                <legend>Type</legend>
+                <div class="form-group">
+                    <input type="radio" id="watermarkText" name="watermarkType" value="IsText" checked />
+                    <label for="watermarkText"> Text</label>
+                    <input type="radio" id="watermarkImage" name="watermarkType" value="IsImage" />
+                    <label for="watermarkImage"> Image</label>
+                </div>
+            </fieldset>
+            <div class="image-group">
+                <fieldset>
+                    <legend>Image</legend>
+                    <div class="form-group">
+                        <input type="radio" id="imageInputFile" name="ImageInput" value="IsFile" checked />
+                        <label for="imageInputFile"> File</label>
+                        <input type="radio" id="imageInputURL" name="ImageInput" value="IsURL" />
+                        <label for="imageInputURL"> URL</label>
+                    </div>
+                    <div class="file-group">
+                        <div class="form-group">
+                            <input type="file" id="imageFile" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="image-URL-group">
+                        <input type="text" id="imageURLInput" placeholder="Enter URL for image" />
+                        <label id="imageURLMessage"></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageSize">Size</label>
+                        <input type="number" class="imageSize" id="imageSize" value="0.7" min="0.1">
+                        <label for="imageAlphaInput">Alpha</label>
+                        <input type="number" id="imageAlphaInput" value="200" class="no-negative">
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Text</legend>
+                    <div class="form-group">
+                        <label for="imageTextCheckbox">Use</label>
+                        <input type="checkbox" id="imageTextCheckbox">
+                    </div>
+                    <div class="image-text-group">
+                        <textarea id="imageTextInput" placeholder="Enter text for image"></textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset class="image-font-group">
+                    <legend>Font</legend>
+                    <div class="form-group">
+                        <label for="imageTextFontSize">Size</label>
+                        <input type="number" id="imageTextFontSize" value="40">
+                        <label for="imageTextFontFamily">Face</label>
+                        <select id="imageTextFontFamily">
+                            <option value="Arial">Arial</option>
+                            <option value="Andale Mono">Andale Mono</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="굴림">굴림</option>
+                            <option value="궁서">궁서</option>
+                            <option value="돋움">돋움</option>
+                            <option value="바탕">바탕</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageTextBold">Bold</label>
+                        <input type="checkbox" id="imageTextBold">
+                        <label for="imageTextItalic">Italic</label>
+                        <input type="checkbox" id="imageTextItalic">
+                        <label for="imageTextStroke">Stroke</label>
+                        <input type="checkbox" id="imageTextStroke">
+                    </div>
+                    <div class="form-group">
+                        <label for="imageTextColor">Color</label>
+                        <input type="color" id="imageTextColor" value="#000000">
+                        <label for="imageTextOffset">Offset</label>
+                        <input type="number" id="imageTextOffset" value="0">
+                    </div>
+                </fieldset>
+            </div>
+            <div class="onoff-group">
+                <fieldset class="text-group">
+                    <legend>Text</legend>
+                    <div class="paragraph-group">
+                        <div class="form-group">
+                            <label for="numParagraphs">Paragraphs</label>
+                            <input type="number" id="numParagraphs" min="1" max="10" value="1" class="no-negative">
+                        </div>
+                        <div id="paragraphContainer"></div>
+                    </div>
+                </fieldset>
+                <fieldset class="font-group">
+                    <legend>Font</legend>
+                    <div class="form-group">
+                        <label for="fontSizeInput">Size</label>
+                        <input type="number" id="fontSizeInput" value="40" class="no-negative">
+                        <label for="fontFamilySelect">Face</label>
+                        <select id="fontFamilySelect">
+                            <option value="Arial">Arial</option>
+                            <option value="Andale Mono">Andale Mono</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="굴림">굴림</option>
+                            <option value="궁서">궁서</option>
+                            <option value="돋움">돋움</option>
+                            <option value="바탕">바탕</option>
+                        </select>
+                        <label for="textBold">Bold</label>
+                        <input type="checkbox" id="textBold" checked>
+                        <label for="textItalic">Italic</label>
+                        <input type="checkbox" id="textItalic">
+                        <label for="textStroke">Stroke</label>
+                        <input type="checkbox" id="textStroke">
+                    </div>
+                    <div class="form-group">
+                        <label for="fontColorInput">Color</label>
+                        <input type="color" id="fontColorInput" value="#000000">
+                        <label for="alphaInput">Alpha</label>
+                        <input type="number" id="alphaInput" value="200" class="no-negative">
+                        <label for="textOffsetInput">Offset</label>
+                        <input type="number" id="textOffsetInput" value="10" class="no-negative">
+                    </div>
+                </fieldset>
+            </div>
+            <fieldset>
+                <legend>Position</legend>
+                <div class="text-group">
+                    <div class="form-group">
+                        <label for="alignmentSelect">Align</label>
+                        <select id="alignmentSelect">
+                            <option value="top_left">Top Left</option>
+                            <option value="top_center">Top Center</option>
+                            <option value="top_right">Top Right</option>
+                            <option value="middle_left">Middle Left</option>
+                            <option value="middle_center">Middle Center</option>
+                            <option value="middle_right">Middle Right</option>
+                            <option value="bottom_left">Bottom Left</option>
+                            <option value="bottom_center">Bottom Center</option>
+                            <option value="bottom_right">Bottom Right</option>
+                        </select>
+                        <label for="rotationInput">Rotation</label>
+                        <input type="number" id="rotationInput" value="0" max="360">
+                    </div>
+                    <div class="form-group">
+                        <label>Offset X</label>
+                        <input type="number" id="offsetXInput" value="0">
+                        <label>Y</label>
+                        <input type="number" id="offsetYInput" value="0">
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Background</legend>
+                <div class="text-group">
+                    <div class="form-group">
+                        <label for="backgroundCheckbox">Use</label>
+                        <input type="checkbox" id="backgroundCheckbox">
+                        <label for="backgroundColorInput">Color</label>
+                        <input type="color" id="backgroundColorInput" value="#000000">
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Border</legend>
+                <div class="text-group">
+                    <div class="form-group">
+                        <label for="borderCheckbox">Use</label>
+                        <input type="checkbox" id="borderCheckbox">
+                        <label for="borderColorInput">Color</label>
+                        <input type="color" id="borderColorInput" value="#ff0000">
+                    </div>
+                    <div class="form-group">
+                        <label for="borderThicknessInput">Thickness</label>
+                        <input type="number" id="borderThicknessInput" value="2" class="no-negative">
+                        <label for="borderOffset">Offset</label>
+                        <input type="number" id="borderOffset" value="6" class="no-negative">
+                    </div>
+                    <div class="form-group">
+                        <label for="borderType">Type</label>
+                        <select id="borderType">
+                            <option value="0">Rect</option>
+                            <option value="1">Round Rect</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="button-group">
+                <button id="updateButton">Add</button>
+                <button id="undoButton">Undo</button>
+            </div>
+            <div class="button-group">
+                <button id="deleteButton">Delete</button>
+                <button id="clearButton">Clear</button>
+            </div>
+        </div>
+        <div class="result-panel">
+            <h2>List</h2>
+            <div id="list-group" class="list-group"></div>
+            <h2>Result</h2>
+            <textarea id="resultArea" readonly></textarea>
+            <button id="copyButton">Copy</button>
+        </div>
+    </div>
+    <script type="module">
+        import VIZ2DCore from "./VIZCore2D/VIZCore2D.js";
+
+        let view = document.getElementById("view2D");
+        view.className = "VIZCore";
+        let vizcore2d = new VIZ2DCore(view);
+        let watermarkType = "IsText";
+        let imageInput = "IsFile";
+        let watermarkIndex = 1;
+        let watermarks = [];
+        let image = '';
+
+        window.onload = function () {
+            const alphaInput = document.getElementById("alphaInput");
+            const imageAlphaInput = document.getElementById("imageAlphaInput");
+            const rotationInput = document.getElementById('rotationInput');
+            const borderThicknessInput = document.getElementById('borderThicknessInput');
+            const borderOffsetInput = document.getElementById('borderOffset');
+            const fontSizeInput = document.getElementById('fontSizeInput');
+            const textOffsetInput = document.getElementById('textOffsetInput');
+            const imageSize = document.getElementById('imageSize');
+
+            if (alphaInput) {
+                alphaInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 0;
+                    } else if (this.value > 255) {
+                        this.value = 255;
+                    }
+                });
+            }
+
+            if (imageAlphaInput) {
+                imageAlphaInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 0;
+                    } else if (this.value > 255) {
+                        this.value = 255;
+                    }
+                });
+            }
+
+            if (rotationInput) {
+                rotationInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 0;
+                    } else if (this.value > 360) {
+                        this.value = 360;
+                    }
+                });
+            }
+
+            if (borderThicknessInput) {
+                borderThicknessInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 2;
+                    }
+                });
+            }
+
+            if (borderOffsetInput) {
+                borderOffsetInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 6;
+                    }
+                });
+            }
+
+            if (fontSizeInput) {
+                fontSizeInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 40;
+                    }
+                });
+            }
+
+            if (textOffsetInput) {
+                textOffsetInput.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 10;
+                    }
+                });
+            }
+
+            if (imageSize) {
+                imageSize.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = 0.7;
+                    }
+                });
+            }
+        };
+
+        // 기본값으로 초기화하는 함수
+        const resetConfigPanel = () => {
+            document.getElementById("numParagraphs").value = 1;
+            document.getElementById("paragraphContainer").innerHTML = "";
+            addParagraphInputs(1);
+
+            document.querySelector('.paragraph-group').style.display = 'flex';
+
+            document.getElementById("fontSizeInput").value = 40;
+            document.getElementById("fontFamilySelect").value = "Arial";
+            document.getElementById("fontColorInput").value = "#000000";
+            document.getElementById("textOffsetInput").value = 10;
+            document.getElementById("alphaInput").value = 200;
+            document.getElementById("imageAlphaInput").value = 200;
+            document.getElementById("alignmentSelect").value = "top_left";
+            document.getElementById("offsetXInput").value = 0;
+            document.getElementById("offsetYInput").value = 0;
+            document.getElementById("backgroundCheckbox").checked = false;
+            document.getElementById("backgroundColorInput").value = "#000000";
+            document.getElementById("borderCheckbox").checked = false;
+            document.getElementById("borderThicknessInput").value = 2;
+            document.getElementById("borderColorInput").value = "#ff0000";
+            document.getElementById("textBold").checked = true;
+            document.getElementById("textItalic").checked = false;
+            document.getElementById("textStroke").checked = false;
+            document.getElementById("rotationInput").value = 0;
+            document.getElementById("imageFile").value = "";
+            document.getElementById("imageURLInput").value = "";
+
+            let imageURLMessage = document.getElementById("imageURLMessage")
+            imageURLMessage.innerHTML = "";
+            imageURLMessage.style.marginBottom = "0px";
+
+            image = '';
+
+            document.getElementById("imageSize").value = 0.7;
+            document.getElementById("borderOffset").value = 6;
+            document.getElementById("imageTextCheckbox").checked = false;
+            document.querySelector('.image-text-group').style.display = 'none'; 
+            document.querySelector('.image-font-group').style.display = 'none'; 
+            document.getElementById("imageTextBold").checked = true;
+            document.getElementById("imageTextItalic").checked = false;
+            document.getElementById("imageTextStroke").checked = false;
+        };
+
+        // 초기 로드 시 UI 설정
+        document.addEventListener("DOMContentLoaded", () => {
+            resetConfigPanel();
+            document.querySelector('.paragraph-group').style.display = 'flex';
+        });
+
+        document.querySelectorAll('input[name="watermarkType"]').forEach((elem) => {
+            elem.addEventListener('change', function (event) {
+                watermarkType = event.target.value;
+                resetConfigPanel();
+                if (watermarkType === 'IsText') {
+                    document.querySelector('.text-group').style.display = 'flex';
+                    document.querySelector('.font-group').style.display = 'flex';
+                    document.querySelector('.image-group').style.display = 'none';
+                    document.querySelector('.paragraph-group').style.display = 'flex';
+                    document.querySelector('.image-font-group').style.display = 'none';
+                } else if (watermarkType === 'IsImage') {
+                    document.querySelector('.text-group').style.display = 'none';
+                    document.querySelector('.font-group').style.display = 'none';
+                    document.querySelector('.image-group').style.display = 'flex';
+                    document.querySelector('.paragraph-group').style.display = 'none';
+                }
+            });
+        });
+
+        document.querySelectorAll('input[name="ImageInput"]').forEach((elem) => {
+            elem.addEventListener('change', function (event) {
+                imageInput = event.target.value;
+                resetConfigPanel(); 
+                if (imageInput === 'IsFile') {
+                    document.querySelector('.file-group').style.display = 'flex';
+                    document.querySelector('.image-URL-group').style.display = 'none';
+                } else if (imageInput === 'IsURL') {
+                    document.querySelector('.file-group').style.display = 'none';
+                    document.querySelector('.image-URL-group').style.display = 'flex';
+                }
+            });
+        });
+
+        document.getElementById('numParagraphs').addEventListener('input', function () {
+            let numParagraphs = parseInt(this.value);
+            if (parseInt(this.value) > 10) {
+                this.value = 10;
+                numParagraphs = 10;
+                addParagraphInputs(numParagraphs);
+            }
+            else if (parseInt(this.value) < 1) {
+                this.value = 1;
+                numParagraphs = 1;
+                addParagraphInputs(numParagraphs);
+            }
+            else {
+                addParagraphInputs(numParagraphs);
+            }
+
+        });
+        const addParagraphInputs = (num) => {
+            let container = document.getElementById('paragraphContainer');
+            container.innerHTML = "";
+            for (let i = 0; i < num; i++) {
+                let textarea = document.createElement('textarea');
+                textarea.className = 'text-input';
+                textarea.placeholder = `Enter text for paragraph ${i + 1}`;
+                container.appendChild(textarea);
+            }
+        };
+
+        document.getElementById('imageFile').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    image = img;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                image = '';
+            }
+        });
+
+        let imageBase64 = '';
+
+        document.getElementById('imageURLInput').addEventListener('change', async function () {
+            const imageURL = document.getElementById('imageURLInput').value.trim();
+            const imageURLMessage = document.getElementById("imageURLMessage");
+            if (imageURL) {
+
+                let img = new Image();
+                img.src = imageURL;
+                img.crossOrigin = '*';
+
+                img.onload = function () {
+                    // Create a canvas element
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+
+                    ctx.drawImage(img, 0, 0);
+
+                    imageBase64 = canvas.toDataURL()
+
+                    let img2 = new Image();
+                    img2.src = imageBase64;
+                    image = img2;
+
+                    imageURLMessage.style.marginBottom = '10px';
+                    imageURLMessage.style.color = 'blue';
+                    imageURLMessage.innerHTML = "이미지를 정상적으로 불러왔습니다.";
+                };
+
+                img.onerror = function () {
+
+                    imageURLMessage.style.marginBottom = '10px';
+                    imageURLMessage.style.color = 'red';
+                    imageURLMessage.innerHTML = "이미지를 로드하는 데 실패했습니다. <br> URL이 유효한지 확인하십시오.";
+                };
+            }
+            else {
+                imageURLMessage.innerHTML = "";
+            }
+        });
+
+        document.getElementById('imageTextCheckbox').addEventListener('change', function () {
+            if (this.checked) {
+                document.querySelector('.image-text-group').style.display = 'flex';
+                document.querySelector('.image-font-group').style.display = 'flex';
+
+            } else {
+                document.querySelector('.image-text-group').style.display = 'none';
+                document.querySelector('.image-font-group').style.display = 'none';
+            }
+        });
+
+        let updateWatermark = () => {
+            // 아이템 기본값 초기화
+            let item = vizcore2d.Watermark.New();
+            let currentIndex = watermarkIndex;
+            let paragraphStartIndices = [];
+            let imageSize = document.getElementById("imageSize");
+            if (isNaN(parseInt(imageSize.value))) {
+                imageSize.value = 0.7;
+            }
+            let fontSizeInput = document.getElementById("fontSizeInput");
+            if (isNaN(parseInt(fontSizeInput.value))) {
+                fontSizeInput.value = 40;
+            }
+            let alphaInput = document.getElementById("alphaInput");
+            if (isNaN(parseInt(alphaInput.value))) {
+                alphaInput.value = 200;
+            }
+            let imageAlphaInput = document.getElementById("imageAlphaInput");
+            if (isNaN(parseInt(imageAlphaInput.value))) {
+                imageAlphaInput.value = 200;
+            }
+            let offsetXInput = document.getElementById("offsetXInput");
+            if (isNaN(parseInt(offsetXInput.value))) {
+                offsetXInput.value = 0;
+            }
+            let offsetYInput = document.getElementById("offsetYInput");
+            if (isNaN(parseInt(offsetYInput.value))) {
+                offsetYInput.value = 0;
+            }
+            let textOffsetInput = document.getElementById("textOffsetInput");
+            if (isNaN(parseInt(textOffsetInput.value))) {
+                textOffsetInput.value = 10;
+            }
+            let rotationInput = document.getElementById("rotationInput");
+            if (isNaN(parseInt(rotationInput.value))) {
+                rotationInput.value = 0;
+            }
+            let borderThicknessInput = document.getElementById("borderThicknessInput");
+            if (isNaN(parseInt(borderThicknessInput.value))) {
+                borderThicknessInput.value = 2;
+            }
+            let borderOffsetInput = document.getElementById("borderOffset");
+            if (isNaN(parseInt(borderOffsetInput.value))) {
+                borderOffsetInput.value = 6;
+            }
+            // 설정된 값을 바탕으로 아이템(워터마크) 생성
+            if (watermarkType === "IsText") {
+                let container = document.getElementById('paragraphContainer');
+                let paragraphs = container.querySelectorAll('.text-input');
+                let totalLines = 0;
+
+                if (paragraphs.length === 0) {
+                    return;
+                }
+
+                for (let i = 0; i < paragraphs.length; i++) {
+                    let textarea = paragraphs[i];
+                    let lines = textarea.value.trim().split('\n').map(line => line.trim()).filter(line => line.length > 0);
+
+                    if (paragraphs[0].value.length === 0) {
+                        return;
+                    }
+                    lines.forEach(line => {
+                        item.text.value.push(line);
+                        totalLines++;
+                    });
+
+                    if (i > 0 && lines.length > 0) {
+                        item.text.division.push(totalLines - lines.length);
+                    }
+                }
+
+                item.style.font.size = parseInt(fontSizeInput.value);
+                item.style.font.face = document.getElementById("fontFamilySelect").value;
+                let fontColor = document.getElementById("fontColorInput").value;
+                item.style.font.color.set(parseInt(fontColor.substr(1, 2), 16), parseInt(fontColor.substr(3, 2), 16), parseInt(fontColor.substr(5, 2), 16), 255);
+                item.style.pageAlpha = parseInt(alphaInput.value);
+                item.style.offset.x = parseInt(offsetXInput.value);
+                item.style.offset.y = parseInt(offsetYInput.value);
+                item.style.font.heightOffset = parseInt(textOffsetInput.value);
+                item.style.rotate = parseInt(rotationInput.value);
+                item.style.border.thickness = parseInt(borderThicknessInput.value);
+                item.style.border.offset = parseInt(borderOffset.value);
+                item.style.font.center = true;
+                item.style.font.bold = document.getElementById("textBold").checked;
+                item.style.font.italic = document.getElementById("textItalic").checked;
+                item.style.font.stroke = document.getElementById("textStroke").checked;
+                item.style.align = vizcore2d.Enum.ALIGN[document.getElementById("alignmentSelect").value.toUpperCase()];
+                item.style.border.enable = document.getElementById("borderCheckbox").checked;
+                let borderType = parseInt(document.getElementById("borderType").value.toUpperCase());
+                item.style.border.type = borderType;
+                let borderColor = document.getElementById("borderColorInput").value;
+                item.style.border.color.set(parseInt(borderColor.substr(1, 2), 16), parseInt(borderColor.substr(3, 2), 16), parseInt(borderColor.substr(5, 2), 16), 255);
+                item.style.background.enable = document.getElementById("backgroundCheckbox").checked;
+                let backgroundColor = document.getElementById("backgroundColorInput").value;
+                item.style.background.color.set(parseInt(backgroundColor.substr(1, 2), 16), parseInt(backgroundColor.substr(3, 2), 16), parseInt(backgroundColor.substr(5, 2), 16), 255);
+
+            } else if (watermarkType === "IsImage") {
+
+                if (image.src === undefined) {
+                    return;
+                }
+
+                let img = new Image();
+                img.src = image.src;
+                item.style.pageAlpha = parseInt(imageAlphaInput.value);
+                item.style.font.face = document.getElementById("imageTextFontFamily").value;
+                item.style.font.size = parseInt(document.getElementById("imageTextFontSize").value);
+                let fontColor = document.getElementById("imageTextColor").value;
+                item.style.font.color.set(parseInt(fontColor.substr(1, 2), 16), parseInt(fontColor.substr(3, 2), 16), parseInt(fontColor.substr(5, 2), 16), 255);
+                item.style.font.bold = document.getElementById("imageTextBold").checked;
+                item.style.font.italic = document.getElementById("imageTextItalic").checked;
+                item.style.font.stroke = document.getElementById("imageTextStroke").checked;
+                item.style.font.center = true;
+                item.style.offset.x = parseInt(document.getElementById("offsetXInput").value);
+                item.style.offset.y = parseInt(document.getElementById("offsetYInput").value);
+                item.style.font.heightOffset = parseInt(document.getElementById("imageTextOffset").value);
+                item.style.border.enable = document.getElementById("borderCheckbox").checked;
+                item.style.border.thickness = parseInt(document.getElementById("borderThicknessInput").value);
+                item.style.border.offset = parseInt(document.getElementById("borderOffset").value);
+                let borderType = parseInt(document.getElementById("borderType").value.toUpperCase());
+                item.style.border.type = borderType;
+                let borderColor = document.getElementById("borderColorInput").value;
+                item.style.border.color.set(parseInt(borderColor.substr(1, 2), 16), parseInt(borderColor.substr(3, 2), 16), parseInt(borderColor.substr(5, 2), 16), 255);
+                item.style.background.enable = document.getElementById("backgroundCheckbox").checked;
+                let backgroundColor = document.getElementById("backgroundColorInput").value;
+                item.style.background.color.set(parseInt(backgroundColor.substr(1, 2), 16), parseInt(backgroundColor.substr(3, 2), 16), parseInt(backgroundColor.substr(5, 2), 16), 255);
+                item.style.rotate = parseInt(document.getElementById("rotationInput").value);
+                item.icon.image = img;
+                item.icon.size = document.getElementById("imageSize").value;
+                if (document.getElementById('imageTextCheckbox').checked) {
+                    item.icon.align = vizcore2d.Enum.ALIGN.MIDDLE_LEFT;
+                    let imageText = document.getElementById("imageTextInput").value.trim();
+                    let lines = imageText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    lines.forEach(line => {
+                        item.text.value.push(line);
+                    });
+                } else {
+                    item.icon.align = vizcore2d.Enum.ALIGN.MIDDLE_CENTER;
+                }
+                item.style.align = vizcore2d.Enum.ALIGN[document.getElementById("alignmentSelect").value.toUpperCase()];
+            }
+
+            vizcore2d.Watermark.Add(item);
+
+            item.id = currentIndex; 
+
+            watermarks.push(item);
+
+            let listGroup = document.getElementById("list-group");
+
+            const listbox = document.createElement("input");
+            listbox.type = 'checkbox';
+            listbox.id = `Watermark${watermarks[watermarks.length - 1].id}`;
+
+            const label = document.createElement('label');
+            label.style.display = 'flex';
+            label.style.gap = '10px';
+
+            const container = document.createElement('div');
+            container.id = `Watermark${watermarks[watermarks.length - 1].id}`;
+            container.style.display = 'flex';
+            container.style.gap = '10px';
+            container.style.marginBottom = '10px';     
+
+            label.appendChild(listbox);
+            label.appendChild(document.createTextNode(`Watermark${watermarks[watermarks.length - 1].id}`));
+
+            container.appendChild(label);
+
+            listGroup.appendChild(container);
+
+            listGroup.scrollTop = listGroup.scrollHeight;
+
+            vizcore2d.View.Render();
+
+            let resultArea = document.getElementById("resultArea");
+            resultArea.value += `let addWatermark${item.id} = () => {\n`;
+            resultArea.value += `    let item = vizcore2d.Watermark.New();\n`;
+
+            if (watermarkType === "IsText") {
+
+                for (let i = 0; i < item.text.value.length; i++) {
+                    resultArea.value += `    item.text.value.push('${item.text.value[i]}');\n`;
+                }
+
+                for (let i = 0; i < item.text.division.length; i++) {
+                    resultArea.value += `    item.text.division.push(${item.text.division[i]});\n`;
+                }
+
+                resultArea.value += `    item.style.pageAlpha = ${parseInt(document.getElementById("alphaInput").value)};\n`;
+                resultArea.value += `    item.style.font.face = "${document.getElementById("fontFamilySelect").value}";\n`;
+                resultArea.value += `    item.style.font.size = ${parseInt(document.getElementById("fontSizeInput").value)};\n`;
+                resultArea.value += `    item.style.font.color.set(${item.style.font.color.r}, ${item.style.font.color.g}, ${item.style.font.color.b}, ${item.style.font.color.a});\n`;
+                resultArea.value += `    item.style.font.bold = ${item.style.font.bold};\n`;
+                resultArea.value += `    item.style.font.italic = ${item.style.font.italic};\n`;
+                resultArea.value += `    item.style.font.center = true;\n`;
+                resultArea.value += `    item.style.offset.x = ${parseInt(document.getElementById("offsetXInput").value)};\n`;
+                resultArea.value += `    item.style.offset.y = ${parseInt(document.getElementById("offsetYInput").value)};\n`;
+                resultArea.value += `    item.style.font.heightOffset = ${parseInt(document.getElementById("textOffsetInput").value)};\n`;
+                resultArea.value += `    item.style.font.stroke = ${item.style.font.stroke};\n`;
+                resultArea.value += `    item.style.border.enable = ${document.getElementById("borderCheckbox").checked};\n`;
+                resultArea.value += `    item.style.border.thickness = ${parseInt(document.getElementById("borderThicknessInput").value)};\n`;
+                resultArea.value += `    item.style.border.offset = ${parseInt(document.getElementById("borderOffset").value)};\n`;
+                resultArea.value += `    item.style.border.type = ${parseInt(document.getElementById("borderType").value.toUpperCase())};\n`;
+                resultArea.value += `    item.style.border.color.set(${item.style.border.color.r}, ${item.style.border.color.g}, ${item.style.border.color.b}, ${item.style.border.color.a});\n`;
+                resultArea.value += `    item.style.background.enable = ${document.getElementById("backgroundCheckbox").checked};\n`;
+                resultArea.value += `    item.style.background.color.set(${item.style.background.color.r}, ${item.style.background.color.g}, ${item.style.background.color.b}, ${item.style.background.color.a});\n`;
+                resultArea.value += `    item.style.rotate = ${parseInt(document.getElementById("rotationInput").value)};\n`;
+                resultArea.value += `    item.style.align = vizcore2d.Enum.ALIGN.${document.getElementById("alignmentSelect").value.toUpperCase()};\n`;
+                resultArea.value += `    vizcore2d.Watermark.Add(item);\n`;
+                resultArea.value += `};\n`;
+
+            } else if (watermarkType === "IsImage") {
+                resultArea.value += `    let img = new Image();\n`;
+                resultArea.value += `    img.src = '${image.src}';\n`;
+                if (document.getElementById('imageTextCheckbox').checked == true) {
+                    resultArea.value += `    item.icon.align = vizcore2d.Enum.ALIGN.MIDDLE_LEFT;\n`;
+                    let imageText = document.getElementById("imageTextInput").value.trim();
+                    let lines = imageText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    lines.forEach(line => {
+                        resultArea.value += `    item.text.value.push("${imageText}");\n`;
+                        resultArea.value += `    item.style.font.face = "${document.getElementById("imageTextFontFamily").value}";\n`;
+                        resultArea.value += `    item.style.font.size = ${parseInt(document.getElementById("imageTextFontSize").value)};\n`;
+                        resultArea.value += `    item.style.font.color.set(${item.style.font.color.r}, ${item.style.font.color.g}, ${item.style.font.color.b}, ${item.style.font.color.a});\n`;
+                        resultArea.value += `    item.style.font.bold = ${item.style.font.bold};\n`;
+                        resultArea.value += `    item.style.font.italic = ${item.style.font.italic};\n`;
+                        resultArea.value += `    item.style.font.center = true;\n`;
+                        resultArea.value += `    item.style.font.stroke = ${item.style.font.stroke};\n`;
+                        resultArea.value += `    item.style.font.heightOffset = ${parseInt(document.getElementById("imageTextOffset").value)};\n`;
+
+                    });
+
+                } else {
+                    resultArea.value += `    item.icon.align = vizcore2d.Enum.ALIGN.MIDDLE_CENTER;\n`;
+                }
+                resultArea.value += `    item.style.pageAlpha = ${parseInt(document.getElementById("imageAlphaInput").value)};\n`;
+                resultArea.value += `    item.style.offset.x = ${parseInt(document.getElementById("offsetXInput").value)};\n`;
+                resultArea.value += `    item.style.offset.y = ${parseInt(document.getElementById("offsetYInput").value)};\n`;
+                resultArea.value += `    item.style.border.enable = ${document.getElementById("borderCheckbox").checked};\n`;
+                resultArea.value += `    item.style.border.thickness = ${parseInt(document.getElementById("borderThicknessInput").value)};\n`;
+                resultArea.value += `    item.style.border.offset = ${parseInt(document.getElementById("borderOffset").value)};\n`;
+                resultArea.value += `    item.style.border.type = ${parseInt(document.getElementById("borderType").value.toUpperCase())};\n`;
+                resultArea.value += `    item.style.border.color.set(${item.style.border.color.r}, ${item.style.border.color.g}, ${item.style.border.color.b}, ${item.style.border.color.a});\n`;
+                resultArea.value += `    item.style.background.enable = ${document.getElementById("backgroundCheckbox").checked};\n`;
+                resultArea.value += `    item.style.background.color.set(${item.style.background.color.r}, ${item.style.background.color.g}, ${item.style.background.color.b}, ${item.style.background.color.a});\n`;
+                resultArea.value += `    item.style.rotate = ${parseInt(document.getElementById("rotationInput").value)};\n`;
+                resultArea.value += `    item.icon.image = img;\n`;
+                resultArea.value += `    item.icon.size = ${document.getElementById("imageSize").value};\n`;
+                resultArea.value += `    item.style.align = vizcore2d.Enum.ALIGN.${document.getElementById("alignmentSelect").value.toUpperCase()};\n`;
+                resultArea.value += `    img.onload = function(){\n`;
+                resultArea.value += `    vizcore2d.Watermark.Add(item);\n`;
+                resultArea.value += `    vizcore2d.View.Render();\n`;
+                resultArea.value += `    };\n`;
+                resultArea.value += `};\n`;
+            }
+
+            resultArea.value += `addWatermark${item.id}();\n\n`;
+
+            watermarkIndex++;
+
+            resultArea.scrollTop = resultArea.scrollHeight;
+        };
+
+        let clearAll = () => {
+            vizcore2d.Watermark.DeleteAll();
+            vizcore2d.View.Render();
+            document.getElementById("resultArea").value = '';
+            watermarks = [];
+            watermarkIndex = 1;
+
+            let listGroup = document.getElementById("list-group");
+            listGroup.innerHTML = '';
+        };
+
+        let undoLastWatermark = () => {
+            if (watermarks.length > 0) {
+                let lastItem = watermarks.pop();
+                vizcore2d.Watermark.Delete(lastItem.id);
+                vizcore2d.View.Render();
+
+                let resultArea = document.getElementById("resultArea");
+                let resultText = resultArea.value;
+
+                let startIndex = resultText.lastIndexOf(`let addWatermark${lastItem.id} = () => {`);
+                if (startIndex !== -1) {
+                    let endIndex = resultText.indexOf(`addWatermark${lastItem.id}();`, startIndex) + `addWatermark${lastItem.id}();\n\n`.length;
+                    resultArea.value = resultText.substring(0, startIndex) + resultText.substring(endIndex);
+                }
+
+                let listGroup = document.getElementById("list-group");
+
+                let container = document.getElementById(`Watermark${lastItem.id}`);
+
+                if (container) {
+                    listGroup.removeChild(container);
+                }
+
+                let remainingWatermarks = Array.from(listGroup.querySelectorAll('input[type="checkbox"]')).map(cb => {
+                    return parseInt(cb.id.replace('Watermark', ''), 10);
+                });
+
+                if (remainingWatermarks.length > 0) {
+                    watermarkIndex = Math.max(...remainingWatermarks) + 1;
+                } else {
+                    watermarkIndex = 1;
+                }
+            }
+        };
+
+        let deleteWatermark = () => {
+            let listGroup = document.getElementById("list-group");
+            let resultArea = document.getElementById("resultArea");
+
+            let checkboxes = listGroup.querySelectorAll('input[type="checkbox"]:checked');
+
+            let watermarkIdsToDelete = [];
+            checkboxes.forEach(checkbox => {
+                let watermarkId = checkbox.id.replace('Watermark', '');
+                watermarkIdsToDelete.push(parseInt(watermarkId, 10));
+
+                vizcore2d.Watermark.Delete(parseInt(watermarkId, 10));
+                vizcore2d.View.Render();
+
+                let container = document.getElementById(`Watermark${watermarkId}`);
+                if (container) {
+                    listGroup.removeChild(container);
+                }
+
+                let resultText = resultArea.value;
+                let startIndex = resultText.lastIndexOf(`let addWatermark${watermarkId} = () => {`);
+                if (startIndex !== -1) {
+                    let endIndex = resultText.indexOf(`addWatermark${watermarkId}();`, startIndex) + `addWatermark${watermarkId}();\n\n`.length;
+                    resultArea.value = resultText.substring(0, startIndex) + resultText.substring(endIndex);
+                }
+            });
+
+            watermarks = watermarks.filter(item => !watermarkIdsToDelete.includes(item.id));
+
+            let remainingWatermarks = Array.from(listGroup.querySelectorAll('input[type="checkbox"]')).map(cb => {
+                return parseInt(cb.id.replace('Watermark', ''), 10);
+            });
+
+            if (remainingWatermarks.length > 0) {
+                watermarkIndex = Math.max(...remainingWatermarks) + 1;
+            } else {
+                watermarkIndex = 1;
+            }
+        };
+
+
+        let copyResult = () => {
+            let resultArea = document.getElementById("resultArea");
+            resultArea.select();
+            document.execCommand("copy");
+        };
+
+        let updateButton = document.getElementById("updateButton");
+        updateButton.addEventListener("click", updateWatermark);
+        let deleteButton = document.getElementById("deleteButton");
+        deleteButton.addEventListener("click", deleteWatermark);
+        let clearButton = document.getElementById('clearButton');
+        clearButton.addEventListener('click', clearAll);
+        let undoButton = document.getElementById('undoButton');
+        undoButton.addEventListener('click', undoLastWatermark);
+        let copyButton = document.getElementById('copyButton');
+        copyButton.addEventListener('click', copyResult);
+
+        let onInitialize = () => {
+            vizcore2d.UIElement.Show(false);
+
+            vizcore2d.Watermark.SetAutoFitSize(true);
+            vizcore2d.Watermark.SetFixPosState(true);
+
+            let onload = (e) => {
+                console.log("onload", e);
+            }
+            let onerror = () => {
+                console.log("onerror");
+            }
+
+            vizcore2d.Model.OpenFile("./model/Sample.vizx2d", onload, onerror); //2D Entity
+        };
+
+        let option = {
+            event: {
+                onInit: onInitialize
+            }
+        };
+        vizcore2d.Init(option);
+    </script>
+</body>
+
+</html>

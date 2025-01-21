@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <title>VIZWeb2DCore :: SOFTHILLS</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" />
+    <link rel="stylesheet" href="./VIZCore2D/resource/css/VIZCore.css">
+    <!-- 프린트 방지 -->
+    <style type="text/css" media="print">
+        body {
+            visibility: hidden;
+            display: none
+        }
+    </style>
+    <style>
+        .VIZCore2D {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script type="module">
+        import VIZ2DCore from "./VIZCore2D/VIZCore2D.js";
+
+        //HTML 문서에서 id가 "view2D"인 div요소 참조
+        let view = document.getElementById("view2D");
+        view.className = "VIZCore";
+
+        //VIZCore2D 객체 생성 및 연결
+        let vizcore2d = new VIZ2DCore(view);
+
+        let onConfiguration = () => {
+            //초기환경설정 변경
+            //UI 툴바로 설정
+            vizcore2d.Configuration.Type = vizcore2d.Enum.UI_TYPE.TOOLBAR; // RIBBONBAR, TOOLBAR
+        }
+
+        let onInitialize = () => {
+            //VIZCore2D 초기화 완료 이벤트
+            console.log('[VIZCore2D] : Initialize!');
+
+            let onload = (e) => {
+                console.log("onload", e);
+                //로딩 완료
+            }
+            let onerror = () => {
+                console.log("onerror");
+                //로딩 실패
+            }
+
+            //파일 열기기
+            vizcore2d.Model.OpenFile("VIZCore2D/MODEL/sample/Sample.vizx2d", onload, onerror); //2D Entity
+        };
+
+        let option = {
+            event: {
+                onInit: onInitialize,
+                onConfiguration: onConfiguration
+            }
+        };
+        vizcore2d.Init(option);
+    </script>
+</head>
+
+<body>
+    <!-- 2D 시각화를 위한 div 요소소-->
+    <div class="VIZWeb_Main">
+        <div id="view2D"></div>
+    </div>
+
+</body>
+
+</html>
