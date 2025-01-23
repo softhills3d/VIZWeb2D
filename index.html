@@ -33,12 +33,6 @@
         //VIZCore2D 객체 생성 및 연결
         let vizcore2d = new VIZ2DCore(view);
 
-        let onConfiguration = () => {
-            //초기환경설정 변경
-            //UI 툴바로 설정
-            vizcore2d.Configuration.Type = vizcore2d.Enum.UI_TYPE.TOOLBAR; // RIBBONBAR, TOOLBAR
-        }
-
         let onInitialize = () => {
             //VIZCore2D 초기화 완료 이벤트
             console.log('[VIZCore2D] : Initialize!');
