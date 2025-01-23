@@ -5,6 +5,8 @@
 ## 개요
 **다양한 브라우저와 디바이스**에서 보다 **빠른 2D 도면(문서/이미지)의 시각화 기능**을 제공하는 **VIZWeb2D**에 대한 기본 웹페이지와 워터마크를 편집 할 수 있는 편집기를 공유 하고 다양한 예제들도 추가 할 예정입니다.
 
+상세 API에 대한 설명은 VIZWeb2D Document ( https://www.softhills.net/SHDC/VIZWeb2D/vizweb2d.html ) 를 참고 하시기 바랍니다.
+
 ---
 ## 시작하기 
 1. VIZCore2D, service를 해당 파일에 적용 ( ※VIZCore2D와 service 파일은 별도로 받아서 적용해야 합니다. )
