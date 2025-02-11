@@ -133,6 +133,10 @@
             margin-top: 10px;
         }
 
+        #clearButton {
+            /* margin-top: 10px; */
+        }
+
         button:hover {
             background-color: #0056b3;
         }
@@ -331,6 +335,7 @@
                     </div>
                     <div class="image-URL-group">
                         <input type="text" id="imageURLInput" placeholder="Enter URL for image" />
+                        <!-- <button id="openURL">Open URL</button> -->
                         <label id="imageURLMessage"></label>
                     </div>
                     <div class="form-group">
@@ -418,6 +423,14 @@
                         <label for="textStroke">Stroke</label>
                         <input type="checkbox" id="textStroke">
                     </div>
+                    <!-- <div class="form-group">
+                        <label for="textBold">Bold</label>
+                        <input type="checkbox" id="textBold" checked>
+                        <label for="textItalic">Italic</label>
+                        <input type="checkbox" id="textItalic">
+                        <label for="textStroke">Stroke</label>
+                        <input type="checkbox" id="textStroke">
+                    </div> -->
                     <div class="form-group">
                         <label for="fontColorInput">Color</label>
                         <input type="color" id="fontColorInput" value="#000000">
@@ -426,6 +439,10 @@
                         <label for="textOffsetInput">Offset</label>
                         <input type="number" id="textOffsetInput" value="10" class="no-negative">
                     </div>
+                    <!-- <div class="form-group">
+                        <label for="textOffsetInput">Offset</label>
+                        <input type="number" id="textOffsetInput" value="10" class="no-negative">
+                    </div> -->
                 </fieldset>
             </div>
             <fieldset>
@@ -513,10 +530,15 @@
         let view = document.getElementById("view2D");
         view.className = "VIZCore";
         let vizcore2d = new VIZ2DCore(view);
+
+        //워터마크 타입 초기설정
         let watermarkType = "IsText";
+
+        //이미지 입력 초기설정
         let imageInput = "IsFile";
-        let watermarkIndex = 1;
-        let watermarks = [];
+
+        let watermarkIndex = 1; // 워터마크 인덱스 초기화
+        let watermarks = []; // 워터마크를 저장하는 배열
         let image = '';
 
         window.onload = function () {
@@ -604,9 +626,9 @@
         const resetConfigPanel = () => {
             document.getElementById("numParagraphs").value = 1;
             document.getElementById("paragraphContainer").innerHTML = "";
-            addParagraphInputs(1);
+            addParagraphInputs(1); // 기본적으로 한 개의 입력박스 추가
 
-            document.querySelector('.paragraph-group').style.display = 'flex';
+            document.querySelector('.paragraph-group').style.display = 'flex'; // 문단 입력 섹션 보이기
 
             document.getElementById("fontSizeInput").value = 40;
             document.getElementById("fontFamilySelect").value = "Arial";
@@ -629,17 +651,19 @@
             document.getElementById("imageFile").value = "";
             document.getElementById("imageURLInput").value = "";
 
+            // URL 메시지 초기화
             let imageURLMessage = document.getElementById("imageURLMessage")
             imageURLMessage.innerHTML = "";
             imageURLMessage.style.marginBottom = "0px";
 
+            // 이미지 초기화
             image = '';
 
             document.getElementById("imageSize").value = 0.7;
             document.getElementById("borderOffset").value = 6;
             document.getElementById("imageTextCheckbox").checked = false;
-            document.querySelector('.image-text-group').style.display = 'none'; 
-            document.querySelector('.image-font-group').style.display = 'none'; 
+            document.querySelector('.image-text-group').style.display = 'none'; // 이미지 텍스트 입력 섹션 숨기기
+            document.querySelector('.image-font-group').style.display = 'none'; // 이미지 폰트 그룹 숨기기
             document.getElementById("imageTextBold").checked = true;
             document.getElementById("imageTextItalic").checked = false;
             document.getElementById("imageTextStroke").checked = false;
@@ -647,14 +671,15 @@
 
         // 초기 로드 시 UI 설정
         document.addEventListener("DOMContentLoaded", () => {
-            resetConfigPanel();
+            resetConfigPanel(); // 입력값 기본값으로 초기화
             document.querySelector('.paragraph-group').style.display = 'flex';
         });
 
+        // 워터마크 타입 변경에 따른 UI 업데이트
         document.querySelectorAll('input[name="watermarkType"]').forEach((elem) => {
             elem.addEventListener('change', function (event) {
                 watermarkType = event.target.value;
-                resetConfigPanel();
+                resetConfigPanel(); // 입력값 기본값으로 초기화
                 if (watermarkType === 'IsText') {
                     document.querySelector('.text-group').style.display = 'flex';
                     document.querySelector('.font-group').style.display = 'flex';
@@ -670,10 +695,11 @@
             });
         });
 
+        // 이미지 입력 타입 변경에 따른 UI 업데이트
         document.querySelectorAll('input[name="ImageInput"]').forEach((elem) => {
             elem.addEventListener('change', function (event) {
                 imageInput = event.target.value;
-                resetConfigPanel(); 
+                resetConfigPanel(); // 입력값 기본값으로 초기화
                 if (imageInput === 'IsFile') {
                     document.querySelector('.file-group').style.display = 'flex';
                     document.querySelector('.image-URL-group').style.display = 'none';
@@ -719,6 +745,8 @@
                 reader.onload = function (e) {
                     const img = new Image();
                     img.src = e.target.result;
+
+                    // img 객체를 다른 곳에서 사용하기 위해 전역 변수나 다른 방법으로 저장
                     image = img;
                 };
                 reader.readAsDataURL(file);
@@ -770,6 +798,45 @@
                 imageURLMessage.innerHTML = "";
             }
         });
+
+        // document.getElementById('openURL').addEventListener('click', async function () {
+        //     const imageURL = document.getElementById('imageURLInput').value.trim();
+        //     const imageURLMessage = document.getElementById("imageURLMessage");
+        //     if (imageURL) {
+
+        //         let img = new Image();
+        //         img.src = imageURL;
+        //         img.crossOrigin = '*';
+
+        //         img.onload = function () {
+        //             // Create a canvas element
+        //             const canvas = document.createElement('canvas');
+        //             const ctx = canvas.getContext('2d');
+
+        //             canvas.width = img.naturalWidth;
+        //             canvas.height = img.naturalHeight;
+
+        //             ctx.drawImage(img, 0, 0);
+
+        //             imageBase64 = canvas.toDataURL()
+
+        //             let img2 = new Image();
+        //             img2.src = imageBase64;
+        //             image = img2;
+
+        //             imageURLMessage.style.marginBottom = '10px';
+        //             imageURLMessage.style.color = 'blue';
+        //             imageURLMessage.innerHTML = "이미지를 정상적으로 불러왔습니다.";
+        //         };
+
+        //         img.onerror = function () {
+
+        //             imageURLMessage.style.marginBottom = '10px';
+        //             imageURLMessage.style.color = 'red';
+        //             imageURLMessage.innerHTML = "이미지를 로드하는 데 실패했습니다. <br> URL이 유효한지 확인하십시오.";
+        //         };
+        //     }
+        // });
 
         document.getElementById('imageTextCheckbox').addEventListener('change', function () {
             if (this.checked) {
@@ -925,11 +992,12 @@
                 item.style.align = vizcore2d.Enum.ALIGN[document.getElementById("alignmentSelect").value.toUpperCase()];
             }
 
+            // view에 워터마크 아이템 추가
             vizcore2d.Watermark.Add(item);
 
-            item.id = currentIndex; 
+            item.id = currentIndex; // 아이템 고유 id를 현재 인덱스로 정의
 
-            watermarks.push(item);
+            watermarks.push(item); // 워터마크 배열에 아이템 추가
 
             let listGroup = document.getElementById("list-group");
 
@@ -940,12 +1008,14 @@
             const label = document.createElement('label');
             label.style.display = 'flex';
             label.style.gap = '10px';
+            // label.textContent = `Watermark${watermarks[watermarks.length - 1].id}`;
 
             const container = document.createElement('div');
             container.id = `Watermark${watermarks[watermarks.length - 1].id}`;
             container.style.display = 'flex';
             container.style.gap = '10px';
-            container.style.marginBottom = '10px';     
+            container.style.marginBottom = '10px';
+            // container.appendChild(listbox);           
 
             label.appendChild(listbox);
             label.appendChild(document.createTextNode(`Watermark${watermarks[watermarks.length - 1].id}`));
@@ -958,20 +1028,23 @@
 
             vizcore2d.View.Render();
 
+            // 결과창에 워터마크 결과값을 추가
             let resultArea = document.getElementById("resultArea");
             resultArea.value += `let addWatermark${item.id} = () => {\n`;
             resultArea.value += `    let item = vizcore2d.Watermark.New();\n`;
 
             if (watermarkType === "IsText") {
-
+                // 텍스트 입력란 추가
                 for (let i = 0; i < item.text.value.length; i++) {
                     resultArea.value += `    item.text.value.push('${item.text.value[i]}');\n`;
                 }
 
+                // 텍스트 문단 구분점 추가
                 for (let i = 0; i < item.text.division.length; i++) {
                     resultArea.value += `    item.text.division.push(${item.text.division[i]});\n`;
                 }
 
+                // 워터마크 스타일 세팅 결과값 
                 resultArea.value += `    item.style.pageAlpha = ${parseInt(document.getElementById("alphaInput").value)};\n`;
                 resultArea.value += `    item.style.font.face = "${document.getElementById("fontFamilySelect").value}";\n`;
                 resultArea.value += `    item.style.font.size = ${parseInt(document.getElementById("fontSizeInput").value)};\n`;
@@ -1032,17 +1105,17 @@
                 resultArea.value += `    item.icon.image = img;\n`;
                 resultArea.value += `    item.icon.size = ${document.getElementById("imageSize").value};\n`;
                 resultArea.value += `    item.style.align = vizcore2d.Enum.ALIGN.${document.getElementById("alignmentSelect").value.toUpperCase()};\n`;
-                resultArea.value += `    img.onload = function(){\n`;
                 resultArea.value += `    vizcore2d.Watermark.Add(item);\n`;
                 resultArea.value += `    vizcore2d.View.Render();\n`;
-                resultArea.value += `    };\n`;
                 resultArea.value += `};\n`;
             }
 
             resultArea.value += `addWatermark${item.id}();\n\n`;
 
+            // 워터마크 인덱스
             watermarkIndex++;
 
+            // 스크롤을 결과값 기준으로 밑으로 변경
             resultArea.scrollTop = resultArea.scrollHeight;
         };
 
@@ -1066,9 +1139,13 @@
                 let resultArea = document.getElementById("resultArea");
                 let resultText = resultArea.value;
 
+                // 마지막 아이템의 아이디를 포함한 결과값의 문자열 인덱스를 찾음
                 let startIndex = resultText.lastIndexOf(`let addWatermark${lastItem.id} = () => {`);
                 if (startIndex !== -1) {
+                    // 찾은 마지막 아이템의 인덱스에서 끝부분의 문자열 인덱스를 찾음.(문자열의 끝위치를 알기위해 해당 문자열의 길이만큼 더함)
                     let endIndex = resultText.indexOf(`addWatermark${lastItem.id}();`, startIndex) + `addWatermark${lastItem.id}();\n\n`.length;
+
+                    // startIndex 이전의 텍스트와 endIndex 이후의 텍스트들을 이어 붙임
                     resultArea.value = resultText.substring(0, startIndex) + resultText.substring(endIndex);
                 }
 
