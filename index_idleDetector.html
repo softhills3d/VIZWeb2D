@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <title>VIZWeb2DCore :: SOFTHILLS</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no" />
+    <link rel="stylesheet" href="./VIZCore2D/resource/css/VIZCore.css">
+    <!-- 프린트 방지 -->
+    <style type="text/css" media="print">
+        body {
+            visibility: hidden;
+            display: none
+        }
+    </style>
+    <style>
+        .VIZCore2D {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script type="module">
+        import VIZ2DCore from "./VIZCore2D/VIZCore2D.js";
+
+        let view = document.getElementById("view2D");
+        view.className = "VIZCore";
+        let vizcore2d = new VIZ2DCore(view);
+
+        /**
+         * VIZCore2D 환경설정 이벤트
+         */
+        let onConfiguration = () => {
+            vizcore2d.Configuration.Type = vizcore2d.Enum.UI_TYPE.TOOLBAR; // RIBBONBAR, TOOLBAR
+        }
+
+
+        let idleTime = 0;
+        let idleLimit = 10; // 기본 유휴 제한 시간 (10초)
+        let checkInterval = 1000; // 기본 검사 주기 (1초)
+        let idleTimer = null;
+
+        function resetIdleTimer() {
+            // 유휴 시간 초과 후 더 이상 체크하지 않음
+            if (idleTime >= idleLimit) return;
+            idleTime = 0;
+        }
+
+        // 유휴 타이머 시작
+        function startIdleTimer() {
+            if (idleTimer !== null) {
+                clearInterval(idleTimer);
+            }
+
+            idleTime = 0;
+
+            idleTimer = setInterval(() => {
+                idleTime++;
+                console.log(`Idle time: ${idleTime}초`);
+
+                if (idleTime >= idleLimit) {
+                    clearInterval(idleTimer);
+                    idleTimer = null;
+
+                    console.log("유휴 시간이 초과");
+                    vizcore2d.Disconnect();
+                }
+            }, checkInterval);
+        }
+
+
+        // 유저 입력 이벤트 등록 (페이지 전체)
+        function registerIdleEvents() {
+            ["mousemove", "keydown", "scroll", "click"].forEach(eventType => {
+                document.addEventListener(eventType, resetIdleTimer);
+            });
+        }
+
+
+        /**
+         * VIZCore2D 초기화 완료 이벤트
+         */
+        let onInitialize = () => {
+            // let info = {
+            //     UserName : 'jhjang'
+            // };
+            // vizcore2d.SetLicenseInfo(info);
+            console.log('[VIZCore2D] : Initialize!');
+
+            let onload = (e) => {
+                console.log("onload", e);
+            }
+            let onerror = () => {
+                console.log("onerror");
+            }
+
+            vizcore2d.Model.OpenFile("./model/Sample.vizx2d", onload, onerror); //2D Entity
+
+
+            // 사용자 입력 감지 이벤트 등록
+            registerIdleEvents();
+
+            // 유휴 타이머 시작
+            startIdleTimer();
+
+
+            let btn1 = document.getElementById("btn1");
+            btn1.addEventListener("click", function () {
+                // 라이선스 서버 연결
+                vizcore2d.Connect();
+                startIdleTimer();
+            });
+        };
+
+        let option = {
+            event: {
+                onInit: onInitialize,
+                onConfiguration: onConfiguration
+            }
+        };
+        vizcore2d.Init(option);
+    </script>
+</head>
+
+<body>
+    <div class="VIZWeb_Main">
+        <div id="view2D">
+            <button id="btn1" style="position: relative; z-index: 300;">License Server Connect</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
