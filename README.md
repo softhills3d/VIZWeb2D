@@ -19,6 +19,7 @@
     - service : 출력 및 캡쳐 서비스 ( 별도 Agent 적용 되어야 적용 ) 
 +  index.html : VIZWeb2D의 기본 페이지
 +  WatermarkEditor.html : VIZWeb2D의 워터마크 편집기 페이지
++  index_idleDetector.html : 유휴 상태 탐지 예제 추가
 
 ---
 
